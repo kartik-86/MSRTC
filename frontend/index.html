@@ -329,7 +329,7 @@ function logout() {
 // Fetch buses
 function fetchBuses() {
     if(!sessionData.token) return;
-    fetch(`http://localhost:3000/buses?month=${monthInput.value}`, {
+    fetch(`https://msrtc.onrender.com/buses?month=${monthInput.value}`, {
         headers: {'Authorization': 'Bearer ' + sessionData.token}
     })
     .then(res => { 
@@ -382,7 +382,7 @@ function addBus() {
     });
     if(existing){ showMessage("This bus number already exists!", "danger"); return; }
 
-    fetch('http://localhost:3000/buses', {
+    fetch('https://msrtc.onrender.com/buses', {
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionData.token},
         body:JSON.stringify({busNumber:normalized,date:today})
@@ -402,7 +402,7 @@ function addBus() {
 
 // Update bus
 function updateBus(id,field,value){
-    fetch(`http://localhost:3000/buses/${id}`, {
+    fetch(`https://msrtc.onrender.com/buses/${id}`, {
         method:'PUT',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionData.token},
         body:JSON.stringify({[field]:value})
@@ -415,7 +415,7 @@ function updateBus(id,field,value){
 // Delete bus
 function deleteBus(id){
     if(!confirm('Are you sure you want to delete this bus record?')) return;
-    fetch(`http://localhost:3000/buses/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+sessionData.token}})
+    fetch(`https://msrtc.onrender.com/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+sessionData.token}})
     .then(res=>res.json())
     .then(data=>{ 
         if(data.message && data.message.includes('successfully')){ 
