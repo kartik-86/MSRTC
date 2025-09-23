@@ -30,15 +30,17 @@ app.use(cors({
 
 
 // ------------------------- MySQL CONNECTION -------------------------
-const db = mysql.createConnection({
+const pool = mysql.createPool({
   host: 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com',
   port: 4000,
   user: 'Na3WQCguqJvPPa8.root',
   password: 'uv25a7EdgDlHnE9H',
   database: 'test',
-  ssl: { rejectUnauthorized: true } // TiDB Cloud requires SSL
+  ssl: { rejectUnauthorized: true },
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
-
 
 db.connect(err => {
   if (err) {
