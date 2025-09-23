@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MSRTC Bus Management - Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .logo img {
+      width: 120px;
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 30px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 5px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-container { display: none; }
+    .form-container.active { display: block; }
+
+    .input-group { position: relative; margin-bottom: 20px; }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #fff;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    input::placeholder { color: #999; }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .message {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer { margin-top: 30px; font-size: 14px; color: #666; }
+
+    @media (max-width: 480px) {
+      .container { padding: 30px 20px; margin: 10px; }
+      .logo img { width: 100px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <img src="MSRTC logo.avif" alt="MSRTC Logo">
+    </div>
+    <h1>MSRTC Bus Management</h1>
+    
+    <div class="tabs">
+      <div class="tab active" id="loginTab">Login</div>
+      <div class="tab" id="registerTab">Register</div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="form-container active" id="loginForm">
+      <form id="loginFormElement">
+        <div class="input-group">
+          <input type="text" id="loginUsername" placeholder="Username" required>
+        </div>
+        <div class="input-group">
+          <input type="password" id="loginPassword" placeholder="Password" required>
+        </div>
+        <button type="submit" id="loginBtn">Login</button>
+      </form>
+    </div>
+
+    <!-- Register Form -->
+    <div class="form-container" id="registerForm">
+      <form id="registerFormElement">
+        <div class="input-group">
+          <input type="text" id="regUsername" placeholder="Username" required>
+        </div>
+        <div class="input-group">
+          <input type="email" id="regEmail" placeholder="Email" required>
+        </div>
+        <div class="input-group">
+          <input type="password" id="regPassword" placeholder="Password (min 6 characters)" required>
+        </div>
+        <button type="submit" id="registerBtn">Register</button>
+      </form>
+    </div>
+
+    <div class="message" id="message"></div>
+    
+    <div class="footer">
+      <p>Secure Bus Maintenance Management System</p>
+    </div>
+  </div>
+
+  <script>
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const message = document.getElementById("message");
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+
+    loginTab.addEventListener("click", () => { switchTab('login'); clearMessage(); });
+    registerTab.addEventListener("click", () => { switchTab('register'); clearMessage(); });
+
+    function switchTab(tab) {
+      if (tab === 'login') {
+        loginTab.classList.add("active");
+        registerTab.classList.remove("active");
+        loginForm.classList.add("active");
+        registerForm.classList.remove("active");
+      } else {
+        registerTab.classList.add("active");
+        loginTab.classList.remove("active");
+        registerForm.classList.add("active");
+        loginForm.classList.remove("active");
+      }
+    }
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = `message ${type}`;
+      message.style.display = 'block';
+      if (type === 'success') {
+        setTimeout(() => { message.style.display = 'none'; }, 3000);
+      }
+    }
+
+    function clearMessage() { message.style.display = 'none'; }
+
+    function setLoading(button, loading) {
+      if (loading) { button.disabled = true; button.innerHTML = '<span class="loading"></span>Processing...'; }
+      else { button.disabled = false; button.innerHTML = button === loginBtn ? 'Login' : 'Register'; }
+    }
+
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function validatePassword(password) { return password.length >= 6; }
+    function validateUsername(username) { return username.length >= 3 && /^[a-zA-Z0-9_]+$/.test(username); }
+
+    document.getElementById("loginFormElement").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      if (!username || !password) { showMessage("Please fill in all fields", "error"); return; }
+      setLoading(loginBtn, true); clearMessage();
+      try {
+        const response = await fetch("http://localhost:3000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        if (data.token) {
+          showMessage("✅ Login successful! Redirecting...", "success");
+          try { sessionStorage.setItem("token", data.token); sessionStorage.setItem("username", data.username); } catch {}
+          setTimeout(() => {
+            window.location.href = `index.html?token=${encodeURIComponent(data.token)}&username=${encodeURIComponent(data.username)}`;
+          }, 1500);
+        } else { showMessage(data.message || "Login failed", "error"); }
+      } catch (error) { showMessage("Connection error. Please check your internet connection.", "error"); }
+      finally { setLoading(loginBtn, false); }
+    });
+
+    document.getElementById("registerFormElement").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("regUsername").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      if (!username || !email || !password) { showMessage("Please fill in all fields", "error"); return; }
+      if (!validateUsername(username)) { showMessage("Username must be at least 3 characters and contain only letters, numbers, and underscores", "error"); return; }
+      if (!validateEmail(email)) { showMessage("Please enter a valid email address", "error"); return; }
+      if (!validatePassword(password)) { showMessage("Password must be at least 6 characters long", "error"); return; }
+      setLoading(registerBtn, true); clearMessage();
+      try {
+        const response = await fetch("http://localhost:3000/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password })
+        });
+        const data = await response.json();
+        if (response.ok && data.message.includes('successfully')) {
+          showMessage("✅ Registration successful! Please login with your credentials.", "success");
+          document.getElementById("regUsername").value = '';
+          document.getElementById("regEmail").value = '';
+          document.getElementById("regPassword").value = '';
+          setTimeout(() => { switchTab('login'); document.getElementById("loginUsername").value = username; }, 2000);
+        } else { showMessage(data.message || "Registration failed", "error"); }
+      } catch (error) { showMessage("Connection error. Please check your internet connection.", "error"); }
+      finally { setLoading(registerBtn, false); }
+    });
+
+    window.addEventListener('load', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenFromUrl = urlParams.get('token');
+      let token = null;
+      try { token = sessionStorage.getItem('token') || tokenFromUrl; } catch { token = tokenFromUrl; }
+      if (token) {
+        showMessage("You are already logged in. Redirecting...", "success");
+        setTimeout(() => { window.location.href = "index.html"; }, 1500);
+      }
+    });
+  </script>
+</body>
+</html>
