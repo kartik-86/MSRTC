@@ -412,21 +412,27 @@ function updateBus(id,field,value){
     .catch(err=>{ console.error(err); showMessage('Failed to update'); });
 }
 
-// Delete bus
 function deleteBus(id){
     if(!confirm('Are you sure you want to delete this bus record?')) return;
-    fetch(`https://msrtc.onrender.com/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+sessionData.token}})
-    .then(res=>res.json())
-    .then(data=>{ 
-        if(data.message && data.message.includes('successfully')){ 
-            showMessage('Bus deleted successfully!','success'); 
-            fetchBuses(); 
-        } else { 
-            showMessage(data.message || 'Failed to delete bus'); 
-        }
+
+    fetch(`https://msrtc.onrender.com/buses/${id}`, { 
+        method:'DELETE', 
+        headers:{'Authorization':'Bearer '+sessionData.token}
     })
-    .catch(err=>{ console.error(err); showMessage('Failed to delete bus'); });
+    .then(res=>{
+        if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+    })
+    .then(data=>{ 
+        showMessage(data.message || 'Bus deleted successfully!','success'); 
+        fetchBuses(); 
+    })
+    .catch(err=>{
+        console.error(err); 
+        showMessage('Failed to delete bus'); 
+    });
 }
+
 
 // Fetch buses when month changes
 monthInput.addEventListener('change', fetchBuses);
