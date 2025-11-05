@@ -7,45 +7,46 @@ const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = 'KartikStrongSecretKey123!'; 
+const JWT_SECRET = 'KartikStrongSecretKey123!';
 
 // Middleware
 app.use(bodyParser.json());
 
 app.use(cors({
- origin: [
+  origin: [
     'https://msrtc.vercel.app',
     'http://127.0.0.1:3000',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
     'http://127.0.0.1:5500',
     'http://localhost:5500'
-],
-
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-
-
 // ------------------------- MySQL CONNECTION -------------------------
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: 'gateway01.ap-southeast-1.prod.aws.tidbcloud.com',
   port: 4000,
   user: 'Na3WQCguqJvPPa8.root',
   password: 'uv25a7EdgDlHnE9H',
   database: 'test',
-  ssl: { rejectUnauthorized: true } // TiDB Cloud requires SSL
+  ssl: { rejectUnauthorized: true },
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-
-db.connect(err => {
+// Test pool connection
+db.getConnection((err, connection) => {
   if (err) {
     console.error('DB connection error:', err);
     process.exit(1);
   } else {
     console.log('Connected to MySQL database');
+    connection.release();
     createTables();
   }
 });
@@ -66,17 +67,15 @@ function createTables() {
     CREATE TABLE IF NOT EXISTS buses (
       id INT AUTO_INCREMENT PRIMARY KEY,
       bus_number VARCHAR(20) NOT NULL,
-      battery1 VARCHAR(50) DEFAULT 'Status',
-      battery2 VARCHAR(50) DEFAULT 'Status',
-      starter VARCHAR(50) DEFAULT 'Status',
-      alternator VARCHAR(50) DEFAULT 'Status',
-      etc1 VARCHAR(50) DEFAULT 'Status',
-      etc2 VARCHAR(50) DEFAULT 'Status',
-      date DATE NOT NULL,
+      battery1 VARCHAR(50) DEFAULT '-',
+      battery2 VARCHAR(50) DEFAULT '-',
+      starter VARCHAR(50) DEFAULT '-',
+      alternator VARCHAR(50) DEFAULT '-',
+      etc1 VARCHAR(50) DEFAULT '-',
+      etc2 VARCHAR(50) DEFAULT '-',
       user_id INT NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-      UNIQUE KEY unique_bus_user_date (bus_number, user_id, date)
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `;
 
@@ -205,21 +204,17 @@ function normalizeBusNumber(busNumber) {
   return busNumber.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
 }
 
-// Get buses by month
+// ✅ Get buses by year
 app.get('/buses', verifyToken, (req, res) => {
-  const month = req.query.month; // YYYY-MM format
-  
-  if (!month || !/^\d{4}-\d{2}$/.test(month)) {
-    return res.status(400).json({ message: 'Valid month parameter required (YYYY-MM format)' });
-  }
+  const year = req.query.year || new Date().getFullYear();
 
   const query = `
     SELECT * FROM buses 
-    WHERE DATE_FORMAT(date, '%Y-%m') = ? AND user_id = ? 
+    WHERE year = ? AND user_id = ? 
     ORDER BY bus_number ASC
   `;
   
-  db.query(query, [month, req.user.id], (err, results) => {
+  db.query(query, [year, req.user.id], (err, results) => {
     if (err) {
       console.error('Error fetching buses:', err);
       return res.status(500).json({ message: 'Database error fetching buses' });
@@ -230,56 +225,46 @@ app.get('/buses', verifyToken, (req, res) => {
 
 // Add bus
 app.post('/buses', verifyToken, (req, res) => {
-  const { busNumber, date } = req.body;
-  
-  if (!busNumber || !date) {
-    return res.status(400).json({ message: 'Bus number and date are required' });
+  const { busNumber, year } = req.body;
+  console.log('📦 Received in POST /buses:', req.body);
+
+  if (!busNumber || !year) {
+    return res.status(400).json({ message: 'Bus number and year are required' });
   }
 
-  // Validate date format
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return res.status(400).json({ message: 'Invalid date format. Use YYYY-MM-DD' });
-  }
-
-  // ✅ Normalize bus number
   const normalizedBusNumber = normalizeBusNumber(busNumber);
-  const month = date.slice(0, 7);
-  
-  // Check if bus already exists for this user and date
+
   const checkQuery = `
     SELECT * FROM buses 
-    WHERE bus_number = ? AND date = ? AND user_id = ?
+    WHERE bus_number = ? AND year = ? AND user_id = ?
   `;
   
-  db.query(checkQuery, [normalizedBusNumber, date, req.user.id], (err, results) => {
+  db.query(checkQuery, [normalizedBusNumber, year, req.user.id], (err, results) => {
     if (err) {
       console.error('Error checking existing bus:', err);
       return res.status(500).json({ message: 'Database error checking existing bus' });
     }
     
     if (results.length > 0) {
-      return res.status(400).json({ 
-        message: 'Bus already exists for this date' 
-      });
+      return res.status(400).json({ message: 'Bus already exists for this year' });
     }
 
-    // Insert new bus with normalized bus number
     const insertQuery = `
       INSERT INTO buses 
-      (bus_number, battery1, battery2, starter, alternator, etc1, etc2, date, user_id) 
-      VALUES (?, 'Status', 'Status', 'Status', 'Status', 'Status', 'Status', ?, ?)
+      (bus_number, battery1, battery2, starter, alternator, etc1, etc2, year, user_id) 
+      VALUES (?, '-', '-', '-', '-', '-', '-', ?, ?)
     `;
     
-    db.query(insertQuery, [normalizedBusNumber, date, req.user.id], (err, result) => {
+    db.query(insertQuery, [normalizedBusNumber, year, req.user.id], (err, result) => {
       if (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          return res.status(400).json({ message: 'Bus already exists for this year' });
+        }
         console.error('Error inserting bus:', err);
         return res.status(500).json({ message: 'Database error adding bus' });
       }
-      
-      res.json({ 
-        message: 'Bus added successfully', 
-        id: result.insertId 
-      });
+  
+      res.json({ message: 'Bus added successfully', id: result.insertId });
     });
   });
 });
@@ -297,8 +282,7 @@ app.put('/buses/:id', verifyToken, (req, res) => {
     return res.status(400).json({ message: 'No fields to update' });
   }
 
-  // Validate allowed fields
-  const allowedFields = ['battery1', 'battery2', 'starter', 'alternator', 'etc1', 'etc2', 'date'];
+  const allowedFields = ['battery1', 'battery2', 'starter', 'alternator', 'etc1', 'etc2'];
   const updateFields = Object.keys(fields).filter(key => allowedFields.includes(key));
   
   if (updateFields.length === 0) {
@@ -318,9 +302,7 @@ app.put('/buses/:id', verifyToken, (req, res) => {
     }
     
     if (result.affectedRows === 0) {
-      return res.status(404).json({ 
-        message: 'Bus not found or not authorized to update' 
-      });
+      return res.status(404).json({ message: 'Bus not found or not authorized to update' });
     }
     
     res.json({ message: 'Bus updated successfully' });
@@ -344,9 +326,7 @@ app.delete('/buses/:id', verifyToken, (req, res) => {
     }
     
     if (result.affectedRows === 0) {
-      return res.status(404).json({ 
-        message: 'Bus not found or not authorized to delete' 
-      });
+      return res.status(404).json({ message: 'Bus not found or not authorized to delete' });
     }
     
     res.json({ message: 'Bus deleted successfully' });
@@ -378,3 +358,21 @@ app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`Health check available at http://localhost:${PORT}/health`);
 });
+
+// ------------------------- ONE-TIME DATABASE MIGRATION -------------------------
+// Run this once, then comment it out or delete it
+// setTimeout(() => {
+//   const alterQuery = 'ALTER TABLE buses ADD COLUMN year INT NOT NULL DEFAULT 2025';
+  
+//   db.query(alterQuery, (err) => {
+//     if (err) {
+//       if (err.code === 'ER_DUP_FIELDNAME') {
+//         console.log('✅ Year column already exists - skip migration');
+//       } else {
+//         console.error('Error adding year column:', err);
+//       }
+//     } else {
+//       console.log('✅ Year column added successfully! You can now delete this migration code.');
+//     }
+//   });
+// }, 2000); // Wait 2 seconds for DB connection to be ready

@@ -6,276 +6,532 @@
 <title>Bus Maintenance Log</title>
 
 <style>
-    /* ---------- General Styles ---------- */
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: #f4f7f9;
+    * {
         margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
         padding: 20px;
         color: #333;
     }
 
     .container {
-        max-width: 1100px;
+        max-width: 1200px;
         margin: 0 auto;
         background: #fff;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        padding: 0;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
     }
 
-    h1, h2 {
-        color: #2c3e50;
-    }
-
-    h2 {
-        margin-bottom: 15px;
-        text-align: center;
-    }
-
-    input[type="text"], input[type="month"], input[type="password"], input[type="email"] {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-
-    button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-    }
-
-    .btn-primary {
-        background: #007bff;
-        color: #fff;
-        font-weight: bold;
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .btn-primary:hover { background: #0069d9; }
-
-    .btn-success {
-        background: #28a745;
-        color: #fff;
-        font-weight: bold;
-        width: 100%;
-    }
-
-    .btn-success:hover { background: #218838; }
-
-    .btn-danger {
-        background: #dc3545;
-        color: #fff;
-        font-size: 14px;
-        padding: 8px 16px;
-    }
-
-    .btn-danger:hover { background: #c82333; }
-
-    .btn-logout {
-        background: #6c757d;
-        color: #fff;
-        padding: 8px 16px;
-        margin-bottom: 20px;
-    }
-
-    .btn-logout:hover { background: #5a6268; }
-
-    /* ---------- Header with Logo ---------- */
     .header {
+        background: linear-gradient(135deg, #4a6fa5 0%, #2c3e50 100%);
+        padding: 30px;
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin-bottom: 20px;
+        gap: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
 
     .header img {
-        height: 50px;
+        height: 60px;
         width: auto;
+        filter: drop-shadow(0 2px 8px rgba(255,255,255,0.3));
     }
 
-    /* ---------- Form and Table Styles ---------- */
+    .header h1 {
+        color: #fff;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .content-wrapper {
+        padding: 30px;
+    }
+
+    h2 { 
+        color: #2c3e50; 
+        margin-bottom: 20px; 
+        text-align: center;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    input[type="text"], select {
+        width: 100%;
+        padding: 14px 18px;
+        margin-bottom: 15px;
+        border: 2px solid #e0e6ed;
+        border-radius: 12px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    input[type="text"]:focus, select:focus {
+        outline: none;
+        border-color: #667eea;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    button {
+        padding: 14px 24px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: #fff;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+    .btn-success:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+    .btn-success:active {
+        transform: translateY(0);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: #fff;
+        font-size: 13px;
+        padding: 10px 20px;
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+    .btn-danger:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-logout {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        color: #fff;
+        padding: 10px 24px;
+        box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+    }
+    .btn-logout:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
+    }
+
     .top-section {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 20px;
+        gap: 20px;
+        margin-bottom: 30px;
     }
 
     .form-container {
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border: 1px solid #dfe6e9;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 16px;
+        border: 2px solid #dee2e6;
         flex: 1;
-        min-width: 280px;
+        min-width: 300px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
-    .table-wrapper {
-        width: 100%;
+    .table-wrapper { 
+        width: 100%; 
         overflow-x: auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     }
 
     table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
         margin-top: 20px;
         min-width: 900px;
     }
 
     th, td {
-        border: 1px solid #dfe6e9;
-        padding: 12px 15px;
+        padding: 16px 20px;
         text-align: left;
+        border-bottom: 1px solid #e9ecef;
     }
 
     th {
-        background: #4a6fa5;
+        background: linear-gradient(135deg, #4a6fa5 0%, #5a7fb8 100%);
         color: #fff;
-        font-weight: bold;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
-    tr:nth-child(even){ background: #f8f9fa; }
+    th:first-child {
+        border-top-left-radius: 16px;
+    }
+
+    th:last-child {
+        border-top-right-radius: 16px;
+    }
+
+    tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+        background: #f8f9fa;
+        transform: scale(1.01);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    tr:nth-child(even){ 
+        background: #fafbfc; 
+    }
 
     td[contenteditable="true"] {
-        background: #eaf2f8;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
         cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        min-width: 80px;
+    }
+    
+    td[contenteditable="true"]:empty:before {
+        content: "-";
+        color: #999;
+    }
+
+    td[contenteditable="true"]:hover {
+        background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
     }
 
     td[contenteditable="true"]:focus {
-        background: #d4e6f1;
-        outline: 2px solid #3498db;
+        background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
     }
 
     .print-btn {
-        background: #007bff;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         color: #fff;
         display: block;
         width: 100%;
-        max-width: 200px;
-        margin: 20px auto 0;
+        max-width: 250px;
+        margin: 30px auto 0;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
     }
-
-    .print-btn:hover { background: #0069d9; }
+    .print-btn:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    }
 
     .user-info {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding: 15px;
-        background: #e3f2fd;
-        border-radius: 8px;
+        margin-bottom: 30px;
+        padding: 20px 30px;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .user-info span {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
     }
 
     .alert {
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 4px;
+        padding: 18px 24px;
+        margin-bottom: 25px;
+        border-radius: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideDown 0.3s ease;
     }
 
-    .alert-danger {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    .alert-success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
+    .alert-danger { 
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24; 
+        border-left: 4px solid #dc3545;
+    }
+    .alert-success { 
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724; 
+        border-left: 4px solid #28a745;
     }
 
-    /* ---------- Print Styles ---------- */
+    .highlight {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%) !important;
+        animation: pulse 1s ease-in-out 3;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+
+    /* Year selector styling */
+    select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a6fa5' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        appearance: none;
+        padding-right: 40px;
+    }
+
+    /* Badge for serial numbers */
+    td:first-child {
+        font-weight: 600;
+        color: #667eea;
+    }
+
+    /* Bus number styling */
+    td:nth-child(2) {
+        font-weight: 600;
+        color: #2c3e50;
+        font-family: 'Courier New', monospace;
+    }
+
     @media print {
-        .form-container, .print-btn, .header, .user-info, .btn-logout { display: none !important; }
-        .action-column, td:last-child { display: none !important; }
-        table { min-width: 100% !important; }
-        th, td { border: 1px solid #000; font-size: 12pt; padding: 8px; }
-        th { background: #ddd !important; color: #000 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
-        tr:nth-child(even){ background: #f2f2f2 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
-        td[contenteditable="true"]{ background: transparent; }
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+        
+        body {
+            background: #fff;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            box-shadow: none;
+            border-radius: 0;
+            max-width: 100%;
+            padding: 0;
+        }
+        
+        .content-wrapper {
+            padding: 0;
+        }
+        
+        .form-container, .print-btn, .user-info, .btn-logout, #message { 
+            display: none !important; 
+        }
+        
+        .header {
+            background: #fff !important;
+            padding: 10px;
+            margin-bottom: 10px;
+            page-break-after: avoid;
+        }
+        
+        .header h1 {
+            color: #000 !important;
+            font-size: 20pt;
+        }
+        
+        .header img {
+            height: 40px;
+        }
+        
+        .table-wrapper {
+            box-shadow: none;
+            border-radius: 0;
+            overflow: visible;
+        }
+        
+        .action-column, 
+        th:last-child,
+        td:last-child { 
+            display: none !important; 
+        }
+        
+        table { 
+            min-width: 100% !important;
+            width: 100% !important;
+            font-size: 9pt !important;
+            border-collapse: collapse !important;
+            page-break-inside: auto;
+        }
+        
+        thead {
+            display: table-header-group;
+        }
+        
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+        
+        th, td { 
+            border: 2px solid #000 !important;
+            padding: 6px 8px !important;
+            text-align: center !important;
+            background: none !important;
+            vertical-align: middle !important;
+        }
+        
+        th { 
+            background: #ddd !important; 
+            color: #000 !important;
+            font-weight: bold !important;
+            font-size: 10pt !important;
+            white-space: nowrap !important;
+            border: 3px solid #000 !important;
+        }
+        
+        td {
+            font-size: 8pt !important;
+        }
+        
+        tr:nth-child(even) td { 
+            background: #f2f2f2 !important; 
+        }
+        
+        /* Ensure bus numbers are readable and bold */
+        td:nth-child(2) {
+            font-family: 'Courier New', monospace !important;
+            font-size: 9pt !important;
+            font-weight: bold !important;
+            color: #000 !important;
+        }
+        
+        /* Serial numbers */
+        td:first-child {
+            font-weight: normal !important;
+            color: #000 !important;
+        }
     }
 
+    @media (max-width: 768px) {
+        .header h1 {
+            font-size: 20px;
+        }
+        .content-wrapper {
+            padding: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+    }
 </style>
 </head>
 
 <body>
-
 <div class="container">
-    <!-- Header with logo on the left -->
     <div class="header">
         <img src="MSRTC logo.avif" alt="MSRTC Logo">
-        <h1> Bus Maintenance Log</h1>
+        <h1>🚌 Bus Maintenance Log</h1>
     </div>
 
-    <!-- Message alert -->
-    <div id="message"></div>
+    <div class="content-wrapper">
+        <div id="message"></div>
 
-    <!-- Main bus section (hidden if not logged in) -->
-    <div id="bus-section" style="display:none;">
-        <!-- User info and logout -->
-        <div class="user-info">
-            <span id="welcome-text">Welcome!</span>
-            <button class="btn-logout" onclick="logout()">Logout</button>
-        </div>
-
-        <!-- Add new bus form -->
-        <div class="top-section">
-            <div class="form-container">
-                <h2>Add New Bus</h2>
-                <input type="text" id="busNumber" placeholder="Bus Number (e.g., MH14-XX1234)">
-                <input type="month" id="monthSelect">
-                <button class="btn-success" onclick="addBus()">Add Bus</button>
+        <div id="bus-section" style="display:none;">
+            <div class="user-info">
+                <span id="welcome-text">Welcome!</span>
+                <button class="btn-logout" onclick="logout()">Logout</button>
             </div>
-        </div>
 
-        <!-- Bus table -->
-        <div class="table-wrapper">
-            <table id="busTable">
-                <thead>
-                    <tr>
-                        <th>Bus Number</th>
-                        <th>Battery 1</th>
-                        <th>Battery 2</th>
-                        <th>Starter</th>
-                        <th>Alternator</th>
-                        <th contenteditable="true">ETC1</th>
-                        <th contenteditable="true">ETC2</th>
-                        <th>Date</th>
-                        <th class="action-column">Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+            <div class="top-section">
+                <div class="form-container">
+                    <h2>➕ Add New Bus</h2>
+                    <input type="text" id="busNumber" placeholder="Bus Number (e.g., MH14-XX1234)">
+                    <select id="yearSelect"></select>
+                    <button class="btn-success" onclick="addBus()">Add Bus</button>
+                </div>
+            </div>
 
-        <button class="print-btn" onclick="window.print()">Print All Data</button>
+            <div class="table-wrapper">
+                <table id="busTable">
+                    <thead>
+                        <tr>
+                            <th>Sr No</th>
+                            <th>Bus Number</th>
+                            <th>Battery 1</th>
+                            <th>Battery 2</th>
+                            <th>Starter</th>
+                            <th>Alternator</th>
+                            <th>ETC1</th>
+                            <th>ETC2</th>
+                            <th class="action-column">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <button class="print-btn" onclick="window.print()">🖨️ Print All Data</button>
+        </div>
     </div>
 </div>
 
 <script>
-/* ---------- Session & Auth Handling ---------- */
 let sessionData = { token: null, username: null };
 const busTable = document.getElementById('busTable').querySelector('tbody');
-const monthInput = document.getElementById('monthSelect');
+const yearSelect = document.getElementById('yearSelect');
 const messageDiv = document.getElementById('message');
-monthInput.value = new Date().toISOString().slice(0,7);
 
-// Normalize bus number (remove spaces & hyphens)
+// --- Initialize year dropdown (2020 - 2100) ---
+const currentYear = new Date().getFullYear();
+for (let y = 2020; y <= 2100; y++) {
+    const option = document.createElement('option');
+    option.value = y;
+    option.textContent = y;
+    yearSelect.appendChild(option);
+}
+yearSelect.value = currentYear;
+
+// Automatically fetch current year's data after dropdown setup
+yearSelect.addEventListener('change', fetchBuses);
+
+// --- Utility functions ---
 function normalizeBusNumber(busNumber) {
     return busNumber.replace(/[\s-]/g, '').toUpperCase();
 }
 
-// Initialize auth session
+function showMessage(text, type = 'danger') {
+    messageDiv.className = `alert alert-${type}`;
+    messageDiv.textContent = text;
+    messageDiv.style.display = 'block';
+    setTimeout(() => { messageDiv.style.display = 'none'; }, 4000);
+}
+
 function initializeAuth() {
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get('token');
@@ -286,24 +542,12 @@ function initializeAuth() {
         sessionData.username = decodeURIComponent(usernameFromUrl);
         window.history.replaceState({}, document.title, window.location.pathname);
     } else {
-        try {
-            sessionData.token = sessionStorage.getItem('token');
-            sessionData.username = sessionStorage.getItem('username');
-        } catch (e) {}
+        sessionData.token = sessionStorage.getItem('token');
+        sessionData.username = sessionStorage.getItem('username');
     }
     checkAuthStatus();
 }
-initializeAuth();
 
-// Show message alerts
-function showMessage(text, type = 'danger') {
-    messageDiv.className = `alert alert-${type}`;
-    messageDiv.textContent = text;
-    messageDiv.style.display = 'block';
-    setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
-}
-
-// Check authentication
 function checkAuthStatus() {
     if(!sessionData.token) {
         showMessage('⚠️ Please login first.', 'danger');
@@ -315,53 +559,37 @@ function checkAuthStatus() {
     }
 }
 
-// Logout function
 function logout() {
-    sessionData.token = null;
-    sessionData.username = null;
-    try { sessionStorage.removeItem('token'); sessionStorage.removeItem('username'); } catch (e) {}
+    sessionStorage.clear();
     showMessage('Logged out successfully', 'success');
     setTimeout(() => { window.location.href = "login.html"; }, 1000);
 }
 
-/* ---------- Bus CRUD Functions ---------- */
-
-// Fetch buses
 function fetchBuses() {
-    if(!sessionData.token) return;
-    fetch(`https://msrtc.onrender.com/buses?month=${monthInput.value}`, {
+    const year = yearSelect.value;
+    fetch(`https://msrtc.onrender.com/buses?year=${year}`, {
         headers: {'Authorization': 'Bearer ' + sessionData.token}
     })
-    .then(res => { 
-        if(res.status === 401){ showMessage('Session expired. Please login again.'); logout(); return; } 
-        return res.json(); 
-    })
+    .then(res => res.json())
     .then(data => {
-        if(!data) return;
         busTable.innerHTML = '';
-        data.forEach(bus => {
+        let sr = 1;
+        (data || []).forEach(bus => {
             const tr = busTable.insertRow();
             tr.dataset.id = bus.id;
-            tr.insertCell(0).textContent = bus.bus_number;
+            tr.insertCell(0).textContent = sr++;
+            tr.insertCell(1).textContent = bus.bus_number;
 
             const editableFields = ['battery1','battery2','starter','alternator','etc1','etc2'];
             editableFields.forEach((key,i) => {
-                const td = tr.insertCell(i+1);
-                td.textContent = bus[key] || 'Status';
+                const td = tr.insertCell(i+2);
+                const value = bus[key];
+                td.textContent = (!value || value === 'Status') ? '-' : value;
                 td.contentEditable = true;
                 td.addEventListener('blur', () => updateBus(tr.dataset.id, key, td.textContent));
                 td.addEventListener('keypress', (e) => { if(e.key==='Enter'){ td.blur(); }});
             });
 
-            // Date column
-            const dateTd = tr.insertCell(7);
-            const today = new Date().toISOString().slice(0,10);
-            dateTd.textContent = bus.date ? new Date(bus.date).toISOString().slice(0,10) : today;
-            dateTd.contentEditable = true;
-            dateTd.addEventListener('blur', () => updateBus(tr.dataset.id, "date", dateTd.textContent));
-            dateTd.addEventListener('keypress', (e) => { if(e.key==='Enter'){ dateTd.blur(); }});
-
-            // Delete button
             const actionTd = tr.insertCell(8);
             actionTd.innerHTML = `<button class="btn-danger" onclick="deleteBus(${bus.id})">Delete</button>`;
         });
@@ -369,38 +597,67 @@ function fetchBuses() {
     .catch(err => { console.error(err); showMessage('Failed to fetch buses'); });
 }
 
-// Add new bus
 function addBus() {
-    let busNumber = document.getElementById('busNumber').value.trim();
+    const busNumber = document.getElementById('busNumber').value.trim();
     if(!busNumber){ showMessage('Please enter a bus number'); return; }
+    
+    // Check if user entered only 4 digits
+    const isOnlyFourDigits = /^\d{4}$/.test(busNumber);
+    
+    if(isOnlyFourDigits) {
+        // Check if these last 4 digits match any existing bus number
+        const existingWithSameDigits = Array.from(busTable.querySelectorAll("tr"))
+            .find(row => {
+                const existingBusNum = row.cells[1].textContent;
+                const lastFourDigits = existingBusNum.slice(-4);
+                return lastFourDigits === busNumber;
+            });
+        
+        if(existingWithSameDigits) {
+            existingWithSameDigits.classList.add('highlight');
+            setTimeout(()=>existingWithSameDigits.classList.remove('highlight'),15000);
+            showMessage("This bus number already exists in the table! Please enter proper bus number like MH01AB1234", "danger");
+            return;
+        }
+        
+        showMessage('Please enter proper bus number format like MH01AB1234', 'danger');
+        return;
+    }
+    
     const normalized = normalizeBusNumber(busNumber);
-    const today = new Date().toISOString().slice(0,10);
 
-    // Prevent duplicate
-    const existing = Array.from(busTable.querySelectorAll("tr")).some(row => {
-        return normalizeBusNumber(row.cells[0].textContent) === normalized;
-    });
-    if(existing){ showMessage("This bus number already exists!", "danger"); return; }
+    const existing = Array.from(busTable.querySelectorAll("tr"))
+        .find(row => normalizeBusNumber(row.cells[1].textContent) === normalized);
+    if(existing){
+        existing.classList.add('highlight');
+        setTimeout(()=>existing.classList.remove('highlight'),15000);
+        showMessage("This bus number already exists!", "danger");
+        return;
+    }
 
     fetch('https://msrtc.onrender.com/buses', {
         method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionData.token},
-        body:JSON.stringify({busNumber:normalized,date:today})
+        headers:{'Content-Type':'application/json',
+                'Authorization':'Bearer '+sessionData.token
+                },
+        body:JSON.stringify({
+            busNumber: normalized,
+            year: yearSelect.value
+        })
     })
     .then(res=>res.json())
-    .then(data=>{ 
+    .then(data=>{
         if(data.id){ 
             showMessage('Bus added successfully!','success'); 
-            document.getElementById('busNumber').value=''; 
-            fetchBuses(); 
-        } else { 
-            showMessage(data.message || 'Failed to add bus'); 
+            document.getElementById('busNumber').value='';
+            fetchBuses();
+        } else {
+            showMessage(data.message || 'Failed to add bus');
         }
     })
     .catch(err=>{ console.error(err); showMessage('Failed to add bus'); });
 }
 
-// Update bus
 function updateBus(id,field,value){
     fetch(`https://msrtc.onrender.com/buses/${id}`, {
         method:'PUT',
@@ -408,29 +665,31 @@ function updateBus(id,field,value){
         body:JSON.stringify({[field]:value})
     })
     .then(res=>res.json())
-    .then(data=>{ if(data.message && data.message.includes('successfully')){ showMessage('Updated successfully!','success'); }})
-    .catch(err=>{ console.error(err); showMessage('Failed to update'); });
+    .then(data=>{
+        if(data.message?.includes('successfully'))
+            showMessage('Updated successfully!','success');
+    })
+    .catch(err=>showMessage('Failed to update'));
 }
 
-// Delete bus
 function deleteBus(id){
     if(!confirm('Are you sure you want to delete this bus record?')) return;
-    fetch(`https://msrtc.onrender.com/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+sessionData.token}})
-    .then(res=>res.json())
-    .then(data=>{ 
-        if(data.message && data.message.includes('successfully')){ 
-            showMessage('Bus deleted successfully!','success'); 
-            fetchBuses(); 
-        } else { 
-            showMessage(data.message || 'Failed to delete bus'); 
-        }
+    fetch(`https://msrtc.onrender.com/buses/${id}`, {
+        method:'DELETE',
+        headers:{'Authorization':'Bearer '+sessionData.token}
     })
-    .catch(err=>{ console.error(err); showMessage('Failed to delete bus'); });
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.message?.includes('successfully')){
+            showMessage('Bus deleted successfully!','success');
+            fetchBuses();
+        } else showMessage(data.message || 'Failed to delete bus');
+    })
+    .catch(err=>showMessage('Failed to delete bus'));
 }
 
-// Fetch buses when month changes
-monthInput.addEventListener('change', fetchBuses);
+yearSelect.addEventListener('change', fetchBuses);
+initializeAuth();
 </script>
-
 </body>
 </html>
