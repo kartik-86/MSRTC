@@ -674,19 +674,19 @@ function updateBus(id,field,value){
 
 function deleteBus(id){
     if(!confirm('Are you sure you want to delete this bus record?')) return;
-    fetch(`https://msrtc.onrender.com/buses/${id}`, {
-        method:'DELETE',
-        headers:{'Authorization':'Bearer '+sessionData.token}
-    })
+    fetch(`https://msrtc.onrender.com/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+sessionData.token}})
     .then(res=>res.json())
-    .then(data=>{
-        if(data.message?.includes('successfully')){
-            showMessage('Bus deleted successfully!','success');
-            fetchBuses();
-        } else showMessage(data.message || 'Failed to delete bus');
+    .then(data=>{ 
+        if(data.message && data.message.includes('successfully')){ 
+            showMessage('Bus deleted successfully!','success'); 
+            fetchBuses(); 
+        } else { 
+            showMessage(data.message || 'Failed to delete bus'); 
+        }
     })
-    .catch(err=>showMessage('Failed to delete bus'));
+    .catch(err=>{ console.error(err); showMessage('Failed to delete bus'); });
 }
+
 
 yearSelect.addEventListener('change', fetchBuses);
 initializeAuth();
