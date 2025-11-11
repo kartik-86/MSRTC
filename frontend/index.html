@@ -229,6 +229,25 @@
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
     }
 
+    th[contenteditable="true"] {
+        background: linear-gradient(135deg, #4a6fa5 0%, #5a7fb8 100%) !important;
+        color: #fff !important;
+        cursor: pointer;
+        border-radius: 0px;
+        transition: all 0.3s ease;
+    }
+
+    th[contenteditable="true"]:hover {
+        background: linear-gradient(135deg, #4a6fa5 0%, #5a7fb8 100%) !important;
+        opacity: 0.8;
+    }
+
+    th[contenteditable="true"]:focus {
+        background: linear-gradient(135deg, #4a6fa5 0%, #5a7fb8 100%) !important;
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        box-shadow: none;
+    }
+
     .print-btn {
         background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         color: #fff;
@@ -322,13 +341,13 @@
     td:nth-child(2) {
         font-weight: 600;
         color: #2c3e50;
-        font-family: 'Courier New', monospace;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     @media print {
         @page {
             size: A4 landscape;
-            margin: 10mm;
+            margin: 5mm;
         }
         
         body {
@@ -381,9 +400,8 @@
         }
         
         table { 
-            min-width: 100% !important;
             width: 100% !important;
-            font-size: 9pt !important;
+            font-size: 7pt !important;
             border-collapse: collapse !important;
             page-break-inside: auto;
         }
@@ -398,20 +416,26 @@
         }
         
         th, td { 
-            border: 2px solid #000 !important;
-            padding: 6px 8px !important;
+            border: 1px solid #000 !important;
+            padding: 5px 4px !important;
             text-align: center !important;
             background: none !important;
             vertical-align: middle !important;
+            word-wrap: break-word;
         }
         
         th { 
             background: #ddd !important; 
             color: #000 !important;
             font-weight: bold !important;
-            font-size: 10pt !important;
-            white-space: nowrap !important;
-            border: 3px solid #000 !important;
+            font-size: 7pt !important;
+            white-space: normal !important;
+            border: 2px solid #000 !important;
+            padding: 4px 3px !important;
+        }
+        
+        td {
+            border: 1px solid #000 !important;
         }
         
         td {
@@ -424,11 +448,13 @@
         
         /* Ensure bus numbers are readable and bold */
         td:nth-child(2) {
-            font-family: 'Courier New', monospace !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
             font-size: 9pt !important;
             font-weight: bold !important;
             color: #000 !important;
         }
+        
+
         
         /* Serial numbers */
         td:first-child {
@@ -472,7 +498,6 @@
                 <div class="form-container">
                     <h2>➕ Add New Bus</h2>
                     <input type="text" id="busNumber" placeholder="Bus Number (e.g., MH14-XX1234)">
-                    <select id="yearSelect"></select>
                     <button class="btn-success" onclick="addBus()">Add Bus</button>
                 </div>
             </div>
@@ -487,8 +512,8 @@
                             <th>Battery 2</th>
                             <th>Starter</th>
                             <th>Alternator</th>
-                            <th>ETC1</th>
-                            <th>ETC2</th>
+                            <th contenteditable="true" data-field="etc1">ETC1</th>
+                            <th contenteditable="true" data-field="etc2">ETC2</th>
                             <th class="action-column">Action</th>
                         </tr>
                     </thead>
@@ -503,22 +528,9 @@
 
 <script>
 let sessionData = { token: null, username: null };
+let headerNames = { etc1: 'ETC1', etc2: 'ETC2' };
 const busTable = document.getElementById('busTable').querySelector('tbody');
-const yearSelect = document.getElementById('yearSelect');
 const messageDiv = document.getElementById('message');
-
-// --- Initialize year dropdown (2020 - 2100) ---
-const currentYear = new Date().getFullYear();
-for (let y = 2020; y <= 2100; y++) {
-    const option = document.createElement('option');
-    option.value = y;
-    option.textContent = y;
-    yearSelect.appendChild(option);
-}
-yearSelect.value = currentYear;
-
-// Automatically fetch current year's data after dropdown setup
-yearSelect.addEventListener('change', fetchBuses);
 
 // --- Utility functions ---
 function normalizeBusNumber(busNumber) {
@@ -566,8 +578,7 @@ function logout() {
 }
 
 function fetchBuses() {
-    const year = yearSelect.value;
-    fetch(`https://msrtc.onrender.com/buses?year=${year}`, {
+    fetch(`https://msrtc.onrender.com/buses`, {
         headers: {'Authorization': 'Bearer ' + sessionData.token}
     })
     .then(res => res.json())
@@ -635,6 +646,7 @@ function addBus() {
         return;
     }
 
+    const currentYear = new Date().getFullYear();
     fetch('https://msrtc.onrender.com/buses', {
         method:'POST',
         headers:{'Content-Type':'application/json',
@@ -642,7 +654,7 @@ function addBus() {
                 },
         body:JSON.stringify({
             busNumber: normalized,
-            year: yearSelect.value
+            year: currentYear
         })
     })
     .then(res=>res.json())
@@ -650,7 +662,7 @@ function addBus() {
         if(data.id){ 
             showMessage('Bus added successfully!','success'); 
             document.getElementById('busNumber').value='';
-            fetchBuses();
+            setTimeout(() => fetchBuses(), 500);
         } else {
             showMessage(data.message || 'Failed to add bus');
         }
@@ -688,7 +700,20 @@ function deleteBus(id){
     .catch(err=>showMessage('Failed to delete bus'));
 }
 
-yearSelect.addEventListener('change', fetchBuses);
+// Setup editable headers
+const editableHeaders = document.querySelectorAll('th[contenteditable="true"]');
+editableHeaders.forEach(th => {
+    th.addEventListener('blur', function() {
+        const field = this.dataset.field;
+        headerNames[field] = this.textContent || (field === 'etc1' ? 'ETC1' : 'ETC2');
+    });
+    th.addEventListener('keypress', function(e) {
+        if(e.key === 'Enter') {
+            this.blur();
+        }
+    });
+});
+
 initializeAuth();
 </script>
 </body>
