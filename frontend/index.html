@@ -346,8 +346,13 @@
 
     @media print {
         @page {
-            size: A4 landscape;
-            margin: 10mm;
+            size: A4;
+            margin: 5mm 5mm;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
         }
         
         body {
@@ -364,7 +369,7 @@
         }
         
         .content-wrapper {
-            padding: 10mm;
+            padding: 5mm;
         }
         
         .form-container, .print-btn, .user-info, .btn-logout, #message { 
@@ -373,40 +378,50 @@
         
         .header {
             background: #fff !important;
-            padding: 10px 0;
-            margin-bottom: 10px;
+            padding: 3mm 0;
+            margin: 0 0 5mm 0;
             page-break-after: avoid;
+            display: flex;
+            align-items: center;
+            gap: 3mm;
+            border-bottom: 2px solid #333;
         }
         
         .header h1 {
             color: #000 !important;
-            font-size: 20pt;
+            font-size: 14pt;
             font-weight: bold;
+            margin: 0;
         }
         
         .header img {
-            height: 40px;
+            height: 12mm;
+            width: auto;
         }
         
         .table-wrapper {
             box-shadow: none;
             border-radius: 0;
             overflow: visible;
-            page-break-before: avoid;
+            margin: 0;
+            padding: 0;
         }
         
-        .action-column, 
-        th:last-child,
+        th:last-child { 
+            display: none !important;
+        }
+        
         td:last-child { 
-            display: none !important; 
+            display: none !important;
         }
         
         table { 
             width: 100% !important;
             border-collapse: collapse !important;
-            font-size: 10pt !important;
-            page-break-inside: auto;
-            margin-bottom: 0px;
+            margin: 0;
+            padding: 0;
+            table-layout: fixed;
+            font-size: 7.5pt;
         }
         
         thead {
@@ -418,90 +433,36 @@
             display: table-row-group;
         }
         
-        tbody tr:nth-child(13) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+13):nth-child(16n+29) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+29):nth-child(16n+45) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+45):nth-child(16n+61) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+61):nth-child(16n+77) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+77):nth-child(16n+93) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+93):nth-child(16n+109) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+109):nth-child(16n+125) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+125):nth-child(16n+141) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+141):nth-child(16n+157) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+157):nth-child(16n+173) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+173):nth-child(16n+189) {
-            page-break-after: always;
-        }
-        
-        tbody tr:nth-child(16n+189):nth-child(16n+205) {
-            page-break-after: always;
-        }
-        
-        tr {
+        tbody tr {
             page-break-inside: avoid;
-            height: 40px;
+            height: 7mm;
         }
         
         th { 
             background: #d3d3d3 !important;
             color: #000 !important;
             font-weight: bold !important;
-            font-size: 11pt !important;
-            border: 1px solid #000 !important;
-            border-right: 2px solid #000 !important;
-            padding: 10px !important;
+            font-size: 8pt !important;
+            border: 1px solid #333 !important;
+            padding: 2mm 1.5mm !important;
             text-align: center !important;
-            word-wrap: break-word;
             white-space: normal;
-            height: 40px;
             vertical-align: middle;
-        }
-        
-        th:last-child {
-            border-right: 1px solid #000 !important;
+            line-height: 1.3;
+            word-wrap: break-word;
         }
         
         td {
-            border: 1px solid #000 !important;
-            padding: 8px !important;
+            border: 1px solid #333 !important;
+            padding: 1.5mm 1mm !important;
             text-align: center !important;
-            font-size: 10pt !important;
+            font-size: 8pt !important;
             color: #000 !important;
-            height: 40px;
             vertical-align: middle;
+            line-height: 1.3;
+            word-wrap: break-word;
+            height: 7mm;
+            overflow: hidden;
         }
         
         tr:nth-child(odd) td { 
@@ -512,16 +473,46 @@
             background: #f5f5f5 !important; 
         }
         
-        td:nth-child(2) {
-            font-weight: bold !important;
+        td:first-child {
+            width: 3%;
+            min-width: 3%;
+            font-size: 7pt;
+            padding: 1mm 0.5mm !important;
+            font-weight: bold;
         }
         
-        th:first-child,
-        td:first-child {
-            width: 35px !important;
-            min-width: 35px !important;
-            max-width: 35px !important;
-            padding: 6px 4px !important;
+        td:nth-child(2) {
+            font-weight: bold !important;
+            width: 10%;
+            font-size: 7.5pt;
+        }
+        
+        td:nth-child(3),
+        td:nth-child(4),
+        td:nth-child(5),
+        td:nth-child(6),
+        td:nth-child(7),
+        td:nth-child(8) {
+            width: 8.5%;
+            font-size: 7.5pt;
+        }
+        
+        th:first-child {
+            width: 3%;
+            min-width: 3%;
+        }
+        
+        th:nth-child(2) {
+            width: 10%;
+        }
+        
+        th:nth-child(3),
+        th:nth-child(4),
+        th:nth-child(5),
+        th:nth-child(6),
+        th:nth-child(7),
+        th:nth-child(8) {
+            width: 8.5%;
         }
     }
 
