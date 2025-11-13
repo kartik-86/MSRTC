@@ -163,11 +163,10 @@
         border-collapse: separate;
         border-spacing: 0;
         margin-top: 20px;
-        min-width: 900px;
     }
 
     th, td {
-        padding: 16px 20px;
+        padding: 20px 28px;
         text-align: left;
         border-bottom: 1px solid #e9ecef;
     }
@@ -322,7 +321,6 @@
         50% { transform: scale(1.02); }
     }
 
-    /* Year selector styling */
     select {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a6fa5' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
@@ -331,23 +329,20 @@
         padding-right: 40px;
     }
 
-    /* Badge for serial numbers */
     td:first-child {
         font-weight: 600;
         color: #667eea;
     }
 
-    /* Bus number styling */
     td:nth-child(2) {
         font-weight: 600;
         color: #2c3e50;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     @media print {
         @page {
-            size: A4;
-            margin: 5mm 5mm;
+            size: A4 portrait;
+            margin: 3mm;
         }
         
         * {
@@ -369,7 +364,7 @@
         }
         
         .content-wrapper {
-            padding: 5mm;
+            padding: 3mm;
         }
         
         .form-container, .print-btn, .user-info, .btn-logout, #message { 
@@ -379,7 +374,7 @@
         .header {
             background: #fff !important;
             padding: 3mm 0;
-            margin: 0 0 5mm 0;
+            margin: 0 0 3mm 0;
             page-break-after: avoid;
             display: flex;
             align-items: center;
@@ -389,14 +384,13 @@
         
         .header h1 {
             color: #000 !important;
-            font-size: 14pt;
+            font-size: 12pt;
             font-weight: bold;
             margin: 0;
         }
         
         .header img {
-            height: 12mm;
-            width: auto;
+            display: none;
         }
         
         .table-wrapper {
@@ -420,8 +414,8 @@
             border-collapse: collapse !important;
             margin: 0;
             padding: 0;
-            table-layout: fixed;
-            font-size: 7.5pt;
+            table-layout: fixed !important;
+            font-size: 8pt;
         }
         
         thead {
@@ -435,34 +429,32 @@
         
         tbody tr {
             page-break-inside: avoid;
-            height: 7mm;
+            height: auto;
         }
         
         th { 
             background: #d3d3d3 !important;
             color: #000 !important;
             font-weight: bold !important;
-            font-size: 8pt !important;
+            font-size: 8.5pt !important;
             border: 1px solid #333 !important;
-            padding: 2mm 1.5mm !important;
+            padding: 4mm 3mm !important;
             text-align: center !important;
-            white-space: normal;
+            white-space: nowrap;
             vertical-align: middle;
-            line-height: 1.3;
-            word-wrap: break-word;
+            line-height: 1.2;
         }
         
         td {
             border: 1px solid #333 !important;
-            padding: 1.5mm 1mm !important;
+            padding: 4mm 3mm !important;
             text-align: center !important;
-            font-size: 8pt !important;
+            font-size: 8.5pt !important;
             color: #000 !important;
             vertical-align: middle;
-            line-height: 1.3;
-            word-wrap: break-word;
-            height: 7mm;
-            overflow: hidden;
+            line-height: 1.2;
+            word-break: break-word;
+            height: 11mm;
         }
         
         tr:nth-child(odd) td { 
@@ -474,17 +466,17 @@
         }
         
         td:first-child {
-            width: 3%;
-            min-width: 3%;
-            font-size: 7pt;
-            padding: 1mm 0.5mm !important;
+            width: 5%;
+            text-align: center;
+            font-size: 8pt;
+            padding: 2mm 1.5mm !important;
             font-weight: bold;
         }
         
         td:nth-child(2) {
+            width: 13%;
             font-weight: bold !important;
-            width: 10%;
-            font-size: 7.5pt;
+            font-size: 8pt;
         }
         
         td:nth-child(3),
@@ -493,17 +485,16 @@
         td:nth-child(6),
         td:nth-child(7),
         td:nth-child(8) {
-            width: 8.5%;
-            font-size: 7.5pt;
+            width: 10%;
+            font-size: 8pt;
         }
         
         th:first-child {
-            width: 3%;
-            min-width: 3%;
+            width: 5%;
         }
         
         th:nth-child(2) {
-            width: 10%;
+            width: 13%;
         }
         
         th:nth-child(3),
@@ -512,7 +503,7 @@
         th:nth-child(6),
         th:nth-child(7),
         th:nth-child(8) {
-            width: 8.5%;
+            width: 10%;
         }
     }
 
@@ -535,7 +526,7 @@
 <div class="container">
     <div class="header">
         <img src="MSRTC logo.avif" alt="MSRTC Logo">
-        <h1>🚌 Bus Maintenance Log</h1>
+        <h1>Bus Maintenance Log</h1>
     </div>
 
     <div class="content-wrapper">
@@ -565,8 +556,8 @@
                             <th>Battery 2</th>
                             <th>Starter</th>
                             <th>Alternator</th>
-                            <th contenteditable="true" data-field="etc1">ETC1</th>
-                            <th contenteditable="true" data-field="etc2">ETC2</th>
+                            <th data-field="fip">FIP</th>
+                            <th contenteditable="true" data-field="etc">ETC</th>
                             <th class="action-column">Action</th>
                         </tr>
                     </thead>
@@ -581,11 +572,10 @@
 
 <script>
 let sessionData = { token: null, username: null };
-let headerNames = { etc1: 'ETC1', etc2: 'ETC2' };
+let headerNames = { fip: 'FIP', etc: 'ETC' };
 const busTable = document.getElementById('busTable').querySelector('tbody');
 const messageDiv = document.getElementById('message');
 
-// --- Utility functions ---
 function normalizeBusNumber(busNumber) {
     return busNumber.replace(/[\s-]/g, '').toUpperCase();
 }
@@ -644,7 +634,7 @@ function fetchBuses() {
             tr.insertCell(0).textContent = sr++;
             tr.insertCell(1).textContent = bus.bus_number;
 
-            const editableFields = ['battery1','battery2','starter','alternator','etc1','etc2'];
+            const editableFields = ['battery1','battery2','starter','alternator','fip','etc'];
             editableFields.forEach((key,i) => {
                 const td = tr.insertCell(i+2);
                 const value = bus[key];
@@ -665,11 +655,9 @@ function addBus() {
     const busNumber = document.getElementById('busNumber').value.trim();
     if(!busNumber){ showMessage('Please enter a bus number'); return; }
     
-    // Check if user entered only 4 digits
     const isOnlyFourDigits = /^\d{4}$/.test(busNumber);
     
     if(isOnlyFourDigits) {
-        // Check if these last 4 digits match any existing bus number
         const existingWithSameDigits = Array.from(busTable.querySelectorAll("tr"))
             .find(row => {
                 const existingBusNum = row.cells[1].textContent;
@@ -689,7 +677,6 @@ function addBus() {
     }
     
     const normalized = normalizeBusNumber(busNumber);
-
     const existing = Array.from(busTable.querySelectorAll("tr"))
         .find(row => normalizeBusNumber(row.cells[1].textContent) === normalized);
     if(existing){
@@ -702,13 +689,8 @@ function addBus() {
     const currentYear = new Date().getFullYear();
     fetch('https://msrtc.onrender.com/buses', {
         method:'POST',
-        headers:{'Content-Type':'application/json',
-                'Authorization':'Bearer '+sessionData.token
-                },
-        body:JSON.stringify({
-            busNumber: normalized,
-            year: currentYear
-        })
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionData.token},
+        body:JSON.stringify({busNumber: normalized, year: currentYear})
     })
     .then(res=>res.json())
     .then(data=>{
@@ -753,12 +735,11 @@ function deleteBus(id){
     .catch(err=>showMessage('Failed to delete bus'));
 }
 
-// Setup editable headers
 const editableHeaders = document.querySelectorAll('th[contenteditable="true"]');
 editableHeaders.forEach(th => {
     th.addEventListener('blur', function() {
         const field = this.dataset.field;
-        headerNames[field] = this.textContent || (field === 'etc1' ? 'ETC1' : 'ETC2');
+        headerNames[field] = this.textContent || (field === 'fip' ? 'FIP' : 'ETC');
     });
     th.addEventListener('keypress', function(e) {
         if(e.key === 'Enter') {
