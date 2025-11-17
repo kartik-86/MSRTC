@@ -557,8 +557,7 @@
                             <th>Starter</th>
                             <th>Alternator</th>
                             <th data-field="fip">FIP</th>
-                            <th data-field="etc1">ETC 1</th>
-                            <th data-field="etc2">ETC 2</th>
+                            <th contenteditable="true" data-field="etc">ETC</th>
                             <th class="action-column">Action</th>
                         </tr>
                     </thead>
@@ -635,7 +634,7 @@ function fetchBuses() {
             tr.insertCell(0).textContent = sr++;
             tr.insertCell(1).textContent = bus.bus_number;
 
-            const editableFields = ['battery1','battery2','starter','alternator','fip','etc1','etc2'];
+            const editableFields = ['battery1','battery2','starter','alternator','fip','etc'];
             editableFields.forEach((key,i) => {
                 const td = tr.insertCell(i+2);
                 const value = bus[key];
