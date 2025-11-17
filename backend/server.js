@@ -283,7 +283,7 @@ app.put('/buses/:id', verifyToken, (req, res) => {
     return res.status(400).json({ message: 'No fields to update' });
   }
 
-  const allowedFields = ['battery1', 'battery2', 'starter', 'alternator', 'etc1', 'etc2'];
+  const allowedFields = ['battery1', 'battery2', 'starter', 'alternator', 'fip', 'etc1', 'etc2'];
   const updateFields = Object.keys(fields).filter(key => allowedFields.includes(key));
   
   if (updateFields.length === 0) {
