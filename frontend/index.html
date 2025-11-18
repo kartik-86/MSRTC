@@ -313,12 +313,31 @@
 
     .highlight {
         background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%) !important;
-        animation: pulse 1s ease-in-out 3;
+        box-shadow: inset 0 0 0 3px #ffc107 !important;
+        animation: highlightPulse 0.5s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.02); }
+    @keyframes highlightPulse {
+        0%, 100% { 
+            box-shadow: inset 0 0 0 3px #ffc107 !important;
+            transform: scale(1);
+        }
+        50% { 
+            box-shadow: inset 0 0 0 3px #ff9800 !important;
+            transform: scale(1.01);
+        }
+    }
+
+    .pinned {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+        border-left: 5px solid #4caf50 !important;
+        margin-top: 5px;
+    }
+
+    .pinned td:first-child::before {
+        content: "📌 ";
+        font-weight: bold;
+        margin-right: 5px;
     }
 
     select {
@@ -573,6 +592,9 @@
 <script>
 let sessionData = { token: null, username: null };
 let headerNames = { fip: 'FIP', etc: 'ETC' };
+let pinnedBusId = null;
+let pinnedTimeout = null;
+let allBusesData = [];
 const busTable = document.getElementById('busTable').querySelector('tbody');
 const messageDiv = document.getElementById('message');
 
@@ -584,7 +606,7 @@ function showMessage(text, type = 'danger') {
     messageDiv.className = `alert alert-${type}`;
     messageDiv.textContent = text;
     messageDiv.style.display = 'block';
-    setTimeout(() => { messageDiv.style.display = 'none'; }, 4000);
+    setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
 }
 
 function initializeAuth() {
@@ -620,33 +642,51 @@ function logout() {
     setTimeout(() => { window.location.href = "login.html"; }, 1000);
 }
 
+function renderTable() {
+    busTable.innerHTML = '';
+    let sr = 1;
+    
+    // Sort: pinned bus first, then others
+    const sortedBuses = allBusesData.sort((a, b) => {
+        if (a.id === pinnedBusId) return -1;
+        if (b.id === pinnedBusId) return 1;
+        return 0;
+    });
+    
+    sortedBuses.forEach((bus) => {
+        const tr = busTable.insertRow();
+        tr.dataset.id = bus.id;
+        
+        if (bus.id === pinnedBusId) {
+            tr.classList.add('pinned');
+        }
+        
+        tr.insertCell(0).textContent = sr++;
+        tr.insertCell(1).textContent = bus.bus_number;
+
+        const editableFields = ['battery1','battery2','starter','alternator','fip','etc1'];
+        editableFields.forEach((key, i) => {
+            const td = tr.insertCell(i+2);
+            const value = bus[key];
+            td.textContent = (!value || value === 'Status') ? '-' : value;
+            td.contentEditable = true;
+            td.addEventListener('blur', () => updateBus(tr.dataset.id, key, td.textContent));
+            td.addEventListener('keypress', (e) => { if(e.key==='Enter'){ td.blur(); }});
+        });
+
+        const actionTd = tr.insertCell(8);
+        actionTd.innerHTML = `<button class="btn-danger" onclick="deleteBus(${bus.id})">Delete</button>`;
+    });
+}
+
 function fetchBuses() {
     fetch(`https://msrtc.onrender.com/buses`, {
         headers: {'Authorization': 'Bearer ' + sessionData.token}
     })
     .then(res => res.json())
     .then(data => {
-        busTable.innerHTML = '';
-        let sr = 1;
-        (data || []).forEach(bus => {
-            const tr = busTable.insertRow();
-            tr.dataset.id = bus.id;
-            tr.insertCell(0).textContent = sr++;
-            tr.insertCell(1).textContent = bus.bus_number;
-
-            const editableFields = ['battery1','battery2','starter','alternator','fip','etc1'];
-            editableFields.forEach((key,i) => {
-                const td = tr.insertCell(i+2);
-                const value = bus[key];
-                td.textContent = (!value || value === 'Status') ? '-' : value;
-                td.contentEditable = true;
-                td.addEventListener('blur', () => updateBus(tr.dataset.id, key, td.textContent));
-                td.addEventListener('keypress', (e) => { if(e.key==='Enter'){ td.blur(); }});
-            });
-
-            const actionTd = tr.insertCell(8);
-            actionTd.innerHTML = `<button class="btn-danger" onclick="deleteBus(${bus.id})">Delete</button>`;
-        });
+        allBusesData = data || [];
+        renderTable();
     })
     .catch(err => { console.error(err); showMessage('Failed to fetch buses'); });
 }
@@ -658,31 +698,41 @@ function addBus() {
     const isOnlyFourDigits = /^\d{4}$/.test(busNumber);
     
     if(isOnlyFourDigits) {
-        const existingWithSameDigits = Array.from(busTable.querySelectorAll("tr"))
-            .find(row => {
-                const existingBusNum = row.cells[1].textContent;
-                const lastFourDigits = existingBusNum.slice(-4);
-                return lastFourDigits === busNumber;
-            });
-        
-        if(existingWithSameDigits) {
-            existingWithSameDigits.classList.add('highlight');
-            setTimeout(()=>existingWithSameDigits.classList.remove('highlight'),15000);
-            showMessage("This bus number already exists in the table! Please enter proper bus number like MH01AB1234", "danger");
-            return;
-        }
-        
         showMessage('Please enter proper bus number format like MH01AB1234', 'danger');
         return;
     }
     
     const normalized = normalizeBusNumber(busNumber);
-    const existing = Array.from(busTable.querySelectorAll("tr"))
-        .find(row => normalizeBusNumber(row.cells[1].textContent) === normalized);
-    if(existing){
-        existing.classList.add('highlight');
-        setTimeout(()=>existing.classList.remove('highlight'),15000);
-        showMessage("This bus number already exists!", "danger");
+    const existingBus = allBusesData.find(bus => normalizeBusNumber(bus.bus_number) === normalized);
+    
+    if(existingBus) {
+        // Highlight for 15 seconds
+        const busRow = busTable.querySelector(`tr[data-id="${existingBus.id}"]`);
+        if (busRow) {
+            busRow.classList.add('highlight');
+            setTimeout(() => busRow.classList.remove('highlight'), 15000);
+            
+            // Scroll to highlighted bus
+            busRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Pin to top for 10 minutes
+        pinnedBusId = existingBus.id;
+        
+        if (pinnedTimeout) {
+            clearTimeout(pinnedTimeout);
+        }
+        
+        renderTable();
+        
+        pinnedTimeout = setTimeout(() => {
+            pinnedBusId = null;
+            renderTable();
+            showMessage('✅ Bus list returned to default sorting', 'success');
+        }, 180000); // 3 minutes
+        
+        showMessage(`📌 Bus "${normalized}" already exists! Moved to top for 10 minutes`, "danger");
+        document.getElementById('busNumber').value = '';
         return;
     }
 
@@ -695,9 +745,9 @@ function addBus() {
     .then(res=>res.json())
     .then(data=>{
         if(data.id){ 
-            showMessage('Bus added successfully!','success'); 
+            showMessage('✅ Bus added successfully!','success'); 
             document.getElementById('busNumber').value='';
-            setTimeout(() => fetchBuses(), 500);
+            fetchBuses();
         } else {
             showMessage(data.message || 'Failed to add bus');
         }
@@ -705,7 +755,7 @@ function addBus() {
     .catch(err=>{ console.error(err); showMessage('Failed to add bus'); });
 }
 
-function updateBus(id,field,value){
+function updateBus(id, field, value){
     fetch(`https://msrtc.onrender.com/buses/${id}`, {
         method:'PUT',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionData.token},
@@ -714,7 +764,7 @@ function updateBus(id,field,value){
     .then(res=>res.json())
     .then(data=>{
         if(data.message?.includes('successfully'))
-            showMessage('Updated successfully!','success');
+            showMessage('✅ Updated successfully!','success');
     })
     .catch(err=>showMessage('Failed to update'));
 }
@@ -728,7 +778,11 @@ function deleteBus(id){
     .then(res=>res.json())
     .then(data=>{
         if(data.message?.includes('successfully')){
-            showMessage('Bus deleted successfully!','success');
+            showMessage('✅ Bus deleted successfully!','success');
+            if (pinnedBusId === id) {
+                pinnedBusId = null;
+                if (pinnedTimeout) clearTimeout(pinnedTimeout);
+            }
             fetchBuses();
         } else showMessage(data.message || 'Failed to delete bus');
     })
