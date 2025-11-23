@@ -321,6 +321,12 @@
         50% { transform: scale(1.02); }
     }
 
+    .pinned-row {
+        background: linear-gradient(135deg, #fff9e6 0%, #fffacd 100%) !important;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+
     select {
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a6fa5' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
@@ -573,6 +579,8 @@
 <script>
 let sessionData = { token: null, username: null };
 let headerNames = { fip: 'FIP', etc: 'ETC' };
+let pinnedBusId = null;
+let pinnedTimeout = null;
 const busTable = document.getElementById('busTable').querySelector('tbody');
 const messageDiv = document.getElementById('message');
 
@@ -618,6 +626,33 @@ function logout() {
     sessionStorage.clear();
     showMessage('Logged out successfully', 'success');
     setTimeout(() => { window.location.href = "login.html"; }, 1000);
+}
+
+function pinnedBusToTop(busId) {
+    if(pinnedTimeout) clearTimeout(pinnedTimeout);
+    
+    const allRows = Array.from(busTable.querySelectorAll('tr'));
+    const rowToPin = allRows.find(row => row.dataset.id == busId);
+    
+    if(rowToPin) {
+        rowToPin.classList.add('pinned-row');
+        busTable.insertBefore(rowToPin, busTable.firstChild);
+        pinnedBusId = busId;
+        updateSerialNumbers();
+        
+        pinnedTimeout = setTimeout(() => {
+            rowToPin.classList.remove('pinned-row');
+            pinnedBusId = null;
+            fetchBuses();
+        }, 180000);
+    }
+}
+
+function updateSerialNumbers() {
+    let sr = 1;
+    Array.from(busTable.querySelectorAll('tr')).forEach(row => {
+        row.cells[0].textContent = sr++;
+    });
 }
 
 function fetchBuses() {
@@ -666,8 +701,7 @@ function addBus() {
             });
         
         if(existingWithSameDigits) {
-            existingWithSameDigits.classList.add('highlight');
-            setTimeout(()=>existingWithSameDigits.classList.remove('highlight'),15000);
+            pinnedBusToTop(existingWithSameDigits.dataset.id);
             showMessage("This bus number already exists in the table! Please enter proper bus number like MH01AB1234", "danger");
             return;
         }
@@ -680,8 +714,7 @@ function addBus() {
     const existing = Array.from(busTable.querySelectorAll("tr"))
         .find(row => normalizeBusNumber(row.cells[1].textContent) === normalized);
     if(existing){
-        existing.classList.add('highlight');
-        setTimeout(()=>existing.classList.remove('highlight'),15000);
+        pinnedBusToTop(existing.dataset.id);
         showMessage("This bus number already exists!", "danger");
         return;
     }
@@ -729,6 +762,8 @@ function deleteBus(id){
     .then(data=>{
         if(data.message?.includes('successfully')){
             showMessage('Bus deleted successfully!','success');
+            if(pinnedTimeout) clearTimeout(pinnedTimeout);
+            pinnedBusId = null;
             fetchBuses();
         } else showMessage(data.message || 'Failed to delete bus');
     })
